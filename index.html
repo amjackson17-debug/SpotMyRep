@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SpotMyRep</title>
+<style>
+*{box-sizing:border-box}
+:root{--purple:#5e2b97;--purple-dark:#3f1d66;--gold:#ffb020}
+html,body{margin:0;padding:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f7f7fb;color:#0f0f12}
+button{cursor:pointer;border:0;border-radius:14px;padding:14px 18px;font-weight:700}
+.container{max-width:1024px;margin:0 auto;padding:20px}
+.header{position:sticky;top:0;background:#fff;z-index:10;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;gap:10px;align-items:center;font-weight:900}
+.brand-pin{width:14px;height:14px;border-radius:50%;background:var(--purple);display:inline-block;position:relative}
+.brand-pin:after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);width:2px;height:8px;background:var(--purple)}
+.badge{background:#eee;border-radius:999px;padding:6px 10px;font-size:12px}
+.tile{background:#fff;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:16px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.06);display:flex;gap:12px;align-items:center}
+.avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--purple),#a879ff)}
+.stars{color:var(--gold);font-size:14px}
+.small{font-size:12px;color:#6b7280}
+.cta{background:var(--purple);color:#fff;box-shadow:0 10px 20px rgba(94,43,151,.28)}
+.ghost{background:#f2e9ff;color:var(--purple-dark)}
+.back{background:#eceef3}
+#splash{min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%, #8a5bd8 0%, var(--purple) 40%, var(--purple-dark) 100%);
+color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px}
+.playful{font-family:"Comic Sans MS","Comic Sans","Baloo 2","Fredoka One",cursive,system-ui,sans-serif;font-size:40px;letter-spacing:.6px;font-weight:900;line-height:1.1;
+background:linear-gradient(90deg,#ffd76a,#ff9bd6,#b08cff,#73e0ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 0 rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.2)}
+.spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+</style></head>
+<body>
+<section id="splash">
+  <div class="playful"><span class="brand-pin"></span> SpotMyRep</div>
+  <div>Real People. Real Products. Right nearby.</div>
+  <div class="spinner" aria-label="Loading"></div>
+  <button onclick="gotoHome()" style="margin-top:10px" class="ghost">Enter App</button>
+</section>
+<div class="header"><div class="header-inner"><div class="brand"><span class="brand-pin"></span> SpotMyRep</div><div class="badge">Prototype</div></div></div>
+<section id="home" style="display:none"><div class="container"><div class="tile">
+  <h2 style="margin:4px 0 10px">Find a consultant</h2>
+  <div class="small">Use <strong>Search Near Me</strong> or browse by company.</div>
+  <div class="list" style="gap:10px;flex-direction:row;flex-wrap:wrap">
+    <button id="loadingButton" class="cta" onclick="searchNearMe()">Search Near Me</button>
+    <button class="ghost" onclick="chooseBrand('Mary Kay')">Mary Kay</button>
+    <button class="ghost" onclick="chooseBrand('Scentsy')">Scentsy</button>
+    <button class="ghost" onclick="chooseBrand('Pure Romance')">Pure Romance</button>
+  </div></div></div></section>
+<section id="results" style="display:none"><div class="container"><div id="resultList" class="list"></div>
+  <div style="padding:14px"><button class="back" onclick="gotoHome()">Back to Home</button></div></div></section>
+<section id="profile" style="display:none"><div class="container"><div id="profileContent"></div></div></section>
+<script>
+let state={brand:null,consultants:[
+{id:1,name:"Jessica R.",brand:"Mary Kay",rating:4.8,distance:"1.2 mi",products:"Skincare, Makeup"},
+{id:2,name:"Brittany T.",brand:"Scentsy",rating:4.6,distance:"2.0 mi",products:"Warmers, Fragrance"},
+{id:3,name:"Amber S.",brand:"Pure Romance",rating:4.7,distance:"3.5 mi",products:"Wellness, Lifestyle"}]};
+function gotoHome(){document.getElementById('splash').style.display='none';document.getElementById('home').style.display='block';}
+function searchNearMe(){const b=document.getElementById('loadingButton');b.disabled=true;const o=b.textContent;b.textContent='Loading...';setTimeout(()=>{b.disabled=false;b.textContent=o;renderResults();},700);}
+function chooseBrand(brand){state.brand=brand;renderResults();}
+function renderResults(){const l=document.getElementById('resultList');l.innerHTML='';let f=state.consultants;if(state.brand)f=f.filter(c=>c.brand===state.brand);f.forEach(c=>{const i=document.createElement('div');i.className='card';i.innerHTML=`
+<div class="avatar"></div><div style="flex:1"><div style="font-weight:900">${c.name}</div>
+<div class="small">${c.brand} • ${c.products}</div><div class="stars">★★★★★ <span class="small">${c.rating}</span></div></div>
+<button class="cta" onclick="openProfile(${c.id})">View</button>`;l.appendChild(i);});document.getElementById('home').style.display='none';document.getElementById('results').style.display='block';document.getElementById('profile').style.display='none';}
+function openProfile(id){const c=state.consultants.find(x=>x.id===id);const el=document.getElementById('profileContent');el.innerHTML=`
+<div class="card" style="align-items:flex-start"><div class="avatar" style="width:72px;height:72px;border-radius:18px"></div>
+<div><div style="font-weight:900;font-size:20px">${c.name}</div><div class="small">${c.brand} • ${c.distance}</div>
+<div class="stars">★★★★★ <span class="small">${c.rating}</span></div></div></div>
+<div class="tile" style="margin-top:10px"><div style="font-weight:800;margin-bottom:6px">Products</div><div class="small">${c.products}</div></div>
+<div style="display:flex;gap:10px;margin-top:10px"><button class="cta" style="background:#10b981" onclick="alert('Messaging coming in live build')">Message</button>
+<button class="ghost" onclick="alert('Saved to Favorites')">Save</button><button class="back" onclick="backToResults()">Back</button></div>`;
+document.getElementById('home').style.display='none';document.getElementById('results').style.display='none';document.getElementById('profile').style.display='block';}
+function backToResults(){document.getElementById('home').style.display='none';document.getElementById('results').style.display='block';document.getElementById('profile').style.display='none';}
+</script>
+</body></html>
